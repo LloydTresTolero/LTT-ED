@@ -14,12 +14,21 @@ export default function AddAssignment() {
     if (!deadline) return alert('Deadline is required');
 
     try {
+      // ✅ Ensure user is logged in
+      if (!auth.currentUser) {
+        alert('You must be logged in to add assignments');
+        return;
+      }
+
       await addDoc(collection(db, 'assignments'), {
-        userId: auth.currentUser.uid,
+        userId: auth.currentUser.uid,   // ✅ tag assignment with current user
         title,
         deadline,
         createdAt: serverTimestamp(),
       });
+
+      setTitle('');
+      setDeadline('');
       router.push('/assignment/list');
     } catch (error) {
       alert('Error adding assignment: ' + error.message);
@@ -29,6 +38,7 @@ export default function AddAssignment() {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Add New Assignment</Text>
+
       <TextInput
         placeholder="Assignment Title"
         value={title}
@@ -36,6 +46,7 @@ export default function AddAssignment() {
         style={styles.input}
         placeholderTextColor="#666"
       />
+
       <TextInput
         placeholder="Deadline (e.g. 2025-10-05)"
         value={deadline}
@@ -43,6 +54,7 @@ export default function AddAssignment() {
         style={styles.input}
         placeholderTextColor="#666"
       />
+
       <View style={styles.buttonWrapper}>
         <Button title="Add Assignment" onPress={handleAdd} color="#1a7431" />
       </View>
